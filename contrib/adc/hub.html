@@ -86,7 +86,7 @@ mention Alice by name.  This command expects a message to be piped/typed
 in via STDIN [this message is meant to be transient and is not stored long
 term; use email for more "permanent" communications].</p>
 
-<pre><code>request-pull child b1 [parent]
+<pre><code>echo "hi Alice, please pull" | ssh git@server hub request-pull child b1 [parent]
 </code></pre>
 
 <p>If <code>child</code> was created by a recent version of the 'fork' ADC (or the KDE
@@ -97,7 +97,7 @@ argument is optional.</p></li>
 made from his repo child to repo parent.  (Note we don't say "accepted" but
 "fetched"; see later for why):</p>
 
-<pre><code>request-status child [parent]
+<pre><code>ssh git@server hub request-status child [parent]
 </code></pre>
 
 <p>The second argument is optional the same way as the 3rd argument in the
@@ -114,13 +114,22 @@ parent.  For each waiting pull request, she will see a serial number, the
 originating repo name (child, in our example), the requestor (Bob, here),
 and the branch/tag-name (b1) being pulled:</p>
 
-<pre><code>list-requests parent
-</code></pre></li>
+<pre><code>ssh git@server hub list-requests parent
+</code></pre>
+
+<p>This command also takes an optional list of search strings that are OR-d
+together and matched against the 'status' field.  So saying</p>
+
+<pre><code>ssh git@server hub list-requests parent fetched pending
+</code></pre>
+
+<p>would list only items that were 'fetched' or 'pending' (meaning 'accepted'
+and 'rejected' would not show up).</p></li>
 <li><p>Alice views request # 1 waiting to be pulled into parent.  Shows the same
 details as above for that request, followed by the message that Bob typed
 in when he ran <code>request-pull</code>:</p>
 
-<pre><code>view-request parent 1
+<pre><code>ssh git@server hub view-request parent 1
 </code></pre></li>
 <li><p>Alice views the log of the branch she is being asked to pull.  Note that
 this does NOT involve a fetch, so it will be pretty fast.  The log starts
@@ -129,7 +138,7 @@ Alice can use any git-log options she wants to; for instance <code>--graph</code
 <code>--decorate</code>, <code>--boundary</code>, etc., could be quite useful.  However, she
 can't use any GUI; it has to be 'git log':</p>
 
-<pre><code>view-log parent 1 &lt;git log options&gt;
+<pre><code>ssh git@server hub view-log parent 1 &lt;git log options&gt;
 </code></pre>
 
 <p>Notice that the repo name Alice supplies is still her own, although the
@@ -138,7 +147,7 @@ best if you think of this as "view the commits from pull request #1 in
 'parent'".</p></li>
 <li><p>Alice views the diff between arbitrary commits on child:</p>
 
-<pre><code>view-diff parent 1 &lt;git diff options&gt;
+<pre><code>ssh git@server hub view-diff parent 1 &lt;git diff options&gt;
 </code></pre>
 
 <p>Again, she mentions <em>her</em> reponame but the diff's come from <code>child</code>.  Also
@@ -155,15 +164,8 @@ to use SHAs instead.</p></li>
 <li><p>Alice doesn't like what she sees and decides to reject it.  This command
 expects some text on STDIN as the rejection message:</p>
 
-<pre><code>reject parent 1
+<pre><code>echo "hi Bob, your patch needs work; see email" | ssh git@server hub reject parent 1
 </code></pre></li>
-</ul>
-
-<p>The following commands will actually fetch from child into parent, and may take
-time if the changes are large.  However all this is on the server so it does
-not involve network traffic:</p>
-
-<ul>
 <li><p>Alice likes what she sees so far and wants to fetch the branch Bob is
 asking her to pull.  Note that we are intentionally not using the word
 "accept", because this command does not (and cannot, since it is running
@@ -176,9 +178,25 @@ to continually refine the branch he is requesting for a pull based on
 (presumably emailed) comments from Alice.  In a way, this is a "remote
 tracking branch", just like <code>refs/remotes/origin/b1</code>.</p>
 
-<pre><code>fetch parent 1
-</code></pre></li>
+<pre><code>ssh git@server hub fetch parent 1
+</code></pre>
+
+<p>This command will actually fetch from child into parent, and may take time
+when the changes are large.  However all this is on the server so it does
+not involve network traffic:</p></li>
+<li><p>Alice has fetched the stuff she wants, looked at it/tested it, and decides
+to merge it into <code>parent</code>.  Once that is done, she runs:</p>
+
+<pre><code>echo "thanks for the frobnitz patch Bob" | ssh git@server hub accept parent 1
+</code></pre>
+
+<p>to let Bob know next time he checks 'request-status'.  Like the <code>reject</code>
+sub-command, this is also just a status update; no actual 'git' changes
+happen.</p></li>
 </ul>
+
+<p>Notice the sequence of Alice's action commands: it's either 'reject', or a
+'fetch' then 'accept'.</p>
 
 <p><a name="_what_next_"></a></p>
 
@@ -187,16 +205,14 @@ tracking branch", just like <code>refs/remotes/origin/b1</code>.</p>
 <p>At this point, you're done with the <code>hub</code> ADC.  However, all this is on the
 bare <code>parent.git</code> on the server, and nothing has hit Alice's workstation yet!
 Alice will still have to run a fetch or a pull on her workstation if she wants
-to check the code in detail, use a tool like gitk, and expecially to
+to check the code in detail, use a tool like gitk, and especially to
 compile/test it.  <em>Then</em> she decides whether to accept or reject the request,
 which will have to be communicated via email, of course; see the second para
 of this document ;-)</p>
 
 <p>Finally, note that Alice does not actually need to use the <code>fetch</code> subcommand.
 She can do the traditional thing and fetch Bob's repo/branch directly to her
-<em>workstation</em>.  She may still want to run the fetch command though, because it
-helpfully prints the complete <code>git fetch</code> command she can paste into her
-shell.</p>
+<em>workstation</em>.</p>
 
 <p><a name="_note_to_the_admin_configuration_variables"></a></p>
 
@@ -204,7 +220,7 @@ shell.</p>
 
 <p>There are 2 configuration variables.  <code>BASE_FETCH_URL</code> should be set to a
 simple "read" URL (so it doesn't even have to be ssh) that almost anyone using
-this server can use.  It's only used in producing a proper <code>git fetch</code> command
+this server can use.  It's only used in producing the <code>git fetch</code> command
 mentioned just above.</p>
 
 <p><code>GL_FORKED_FROM</code> is set to <code>gl-forked-from</code> by default, but if your initials

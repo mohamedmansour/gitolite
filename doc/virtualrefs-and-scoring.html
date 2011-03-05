@@ -59,11 +59,11 @@ Here're some examples:</p>
 <ul>
 <li>prevent pushing changes to specific, critical, files (e.g., <code>Makefile</code>)</li>
 <li>prevent adding new files by file "type" (perhaps using the <code>file</code> command)</li>
-<li>allow only files smaller than a certain size to be added</li>
-<li>allow only pushes that affect less than a certain number of files</li>
+<li>prevent files larger than a certain size to be added</li>
+<li>prevent pushes that affect more than a certain number of files</li>
 <li>allow some actions only if coming from an internal IP (perceived to be
 more secure perhaps)</li>
-<li>allow some actions only if coming in via ssh instead of httpd</li>
+<li>prevent some actions if coming in via httpd (instead of ssh)</li>
 </ul>
 
 <p>If you think about it, each of these is a characteristic of the push, just
@@ -76,8 +76,8 @@ merely showing the syntax):</p>
 
 <pre><code>-   VR_NAME/Makefile    =   @junior_devs
 -   VR_TYPE/relocatable =   @junior_devs
-RW  VR_SIZE/500000      =   @junior_devs
-RW  VR_COUNT/10         =   @junior_devs
+-   VR_SIZE/500000      =   @junior_devs
+-   VR_COUNT/10         =   @junior_devs
 RW+ VR_IP/172\.25\.     =   @junior_devs
 -   VR_VIA/http         =   @junior_devs
 </code></pre>
@@ -144,9 +144,9 @@ also serves as documentation on writing VR scripts.</p>
 <pre><code>-   VR_NAME/Makefile    @interns
 </code></pre>
 
-<p>can have several interpretations.  The simplest is: "does <code>git diff $oldsha
-$newsha</code> contain a file called <code>Makefile</code>?  If it does, do not let an intern
-push the commit chain".</p>
+<p>can have several interpretations.  The simplest (and the one we use) is: "does
+<code>git diff $oldsha $newsha</code> contain a file called <code>Makefile</code>?  If it does, do
+not let an intern push the commit chain".</p>
 
 <p>However, this means such an intern can <em>never</em> create a personal branch based
 off of some existing branch (as described <a href="http://sitaramc.github.com/gitolite/doc/3-faq-tips-etc.html#_personal_branches">here</a>), which sorta defeats the
@@ -154,10 +154,10 @@ purpose of having personal branches, no?</p>
 
 <p>If all he did was <code>git checkout -b priv/ashok/my-master master; git push
 origin HEAD</code>, is that really the same as touching the Makefile?  What if we're
-prefer to ask: "is the <code>Makefile</code> touched by one of the <em>new</em> commits (if any)
-he made"?  This actually means we have to look among the commits in $newsha
-that do not already exist in the repo (reachable from $oldsha or <em>any</em> other
-ref in the repo).</p>
+prefer to ask: "is the <code>Makefile</code> touched by one of the <strong>new commits</strong> (if
+any) he made"?  This actually means we have to look in all the commits in
+$newsha that do not already exist in the repo (i.e., reachable from $oldsha or
+<em>any</em> other ref in the repo).</p>
 
 <p>As you can see, that's quite a distinction.  Even the code isn't
 straightforward:</p>
@@ -168,12 +168,13 @@ straightforward:</p>
 <p>[Note: There're probably a few other ways to skin that cat; I'm open to better ideas.]</p>
 
 <p>How about another wrinkle?  What if we want to make a distinction between
-adding a file which did not even exist before, and updating one that already
-existed?  We have a project where a small set of 3rd party JAR files (yes,
-binaries!) are needed to be regularly checked in for completeness of the build
-scripts[1].  It is possible that a junior dev may end up having to update one
-of these and push, and we want to allow that, while preventing him from
-pushing any of the myriad other JAR files in his work tree.</p>
+adding a <strong>new file</strong> which did not exist in the branch before, and updating
+one that already existed?  We have a project where a small set of 3rd party
+JAR files (yes, binaries!) are needed to be regularly checked in for
+completeness of the build scripts[1].  It is possible that a junior dev may
+end up having to update one of these and push, and we want to allow that,
+while preventing him from pushing any of the myriad other JAR files in his
+work tree.</p>
 
 <p>[1] -- please let us not discuss other ways of doing this; we're discussing
 gitolite features here not git features.</p>
@@ -193,7 +194,8 @@ virtual ref.</p>
 
 <p>is meant to protect from large-scale changes (as described near the top of
 this document), but it also suffers the same problems as <code>VR_NAME</code> if the poor
-lowly intern should decide to create a personal branch from an existing one.</p>
+lowly intern should decide to create a personal branch from an existing one;
+the rule doesn't satisfy the "count less than 10" and the push is denied.</p>
 
 <p>The way to deal with this is to allow VR scripts to accept an optional list of
 arguments after the first 5 (see <code>VR_COUNT</code> for more).  Let us say we decide
@@ -214,6 +216,8 @@ the 6th argument (after the first 5 mandatory ones -- see <code>VR_COUNT</code> 
 details) to the <code>gl-VR_NAME</code> script.  And (if you're willing to test it!)
 <code>VR_COUNT-nf-nc</code> passes both <code>nf</code> and <code>nc</code> as the 6th and 7th arguments to the
 count script.</p>
+
+<p>Mnemonic: <code>VR_FOO-bar-baz</code> is like <code>VR_FOO -bar -baz</code>.</p>
 
 <p><a name="_scoring"></a></p>
 
