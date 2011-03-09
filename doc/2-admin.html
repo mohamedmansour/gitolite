@@ -39,10 +39,12 @@
 <h3>please read this first</h3>
 
 <p>Unless you know what you're doing, do not do <strong>anything</strong> manually on the
-server, like adding new repositories or users or changing the access control
-rules.  Things will break.  For example, if you manually create a repo on the
-server, it will not have the required "update" hook, without which there is no
-access control for pushes.</p>
+server (except when the documentation says you should, for example to add
+custom hooks).  In particular, adding new repositories or users or changing
+the access control rules should not be done directly on the server.  Things
+will break.  For example, if you manually create a repo on the server, it will
+not have the required "update" hook, without which there is no access control
+for pushes.</p>
 
 <p>Most normal (day-to-day) gitolite admin work is done by cloning the
 gitolite-admin repo from the server to your workstation, making changes to the
