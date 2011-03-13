@@ -101,7 +101,14 @@ made from his repo child to repo parent.  (Note we don't say "accepted" but
 </code></pre>
 
 <p>The second argument is optional the same way as the 3rd argument in the
-previous command.</p></li>
+previous command.</p>
+
+<p>Requests that have been accepted or rejected will usually have some
+additional text, supplied by the user who did the reject/accept.  Bob can
+ask for those details by request number:</p>
+
+<pre><code>ssh git@server hub request-status child [parent] request-number
+</code></pre></li>
 </ul>
 
 <p><a name="_Alice_s_just_looking_commands"></a></p>
