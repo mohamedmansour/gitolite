@@ -93,14 +93,14 @@ export GITOLITE_HTTP_HOME
 GITOLITE_HTTP_HOME=/var/www/gitolite-home
 PATH=$PATH:$GITOLITE_HTTP_HOME/bin
 </code></pre></li>
-<li><p>now run the first 3 install steps for "non-root" method (clone, mkdir, and
-gl-system-install), but <strong>substitute</strong> <code>GITOLITE_HTTP_HOME</code> in place of
-<code>HOME</code> in the mkdir and gl-system-install steps.</p>
-
-<p><strong>Do NOT run the gl-setup step yet</strong>.</p>
+<li><p>now run the following commands.  These are really the first 3 steps of the
+"non-root" install (clone, mkdir, and gl-system-install), <strong>except</strong> you
+substitute <code>GITOLITE_HTTP_HOME</code> in place of <code>HOME</code>.  Note that you do NOT
+run the gl-setup step yet.</p>
 
 <pre><code>cd gitolite-home
 git clone /tmp/gitolite.git gitolite-source
+    # or wherever your local clone is, or directly from git://github.com/sitaramc/gitolite
 
 cd gitolite-source
 GHH=$GITOLITE_HTTP_HOME     # just for convenience in next 2 commands
@@ -111,7 +111,7 @@ src/gl-system-install $GHH/bin $GHH/share/gitolite/conf $GHH/share/gitolite/hook
 /var/www/gitolite-home/share/gitolite/conf/example.gitolite.rc</p>
 
 <pre><code>$ENV{GIT_HTTP_BACKEND} = "/usr/libexec/git-core/git-http-backend";
-    # or wherever you have that file; not NO trailing slash
+    # or wherever you have that file; note: NO trailing slash
 $ENV{PATH} .= ":$ENV{GITOLITE_HTTP_HOME}/bin";
     # note the ".=" here, not "="
 </code></pre></li>
