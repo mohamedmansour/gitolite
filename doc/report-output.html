@@ -117,7 +117,8 @@ to one of the <code>@all</code> uses), but no explicit access.</p>
 
 <p>In "big-config" mode (i.e., when <code>GL_BIG_CONFIG</code> is set) the pattern is
 <strong>mandatory</strong>.  You can try and cheat the system by passing in a "." but
-gitolite truncates the output after 20 results to prevent a DOS.</p>
+gitolite truncates the output after 20 results to prevent a DOS.  (This limit
+can be changed; see <code>$BIG_INFO_CAP</code> in <a href="http://sitaramc.github.com/gitolite/doc/gitolite.rc.html">doc/gitolite.rc.mkd</a>).</p>
 
 <p>The pattern is also mandatory when an admin wants to find out what access some
 <em>other</em> user has, which you may have guessed from the syntax in the "usage"
@@ -159,3 +160,6 @@ account extra permissions enabled by the <code>setperms</code> command (see
 doc/wildcard-repositories.mkd).  It shows you the "creator" of the repo as
 an additional column, defaulting to <code>&lt;gitolite&gt;</code> if it was not a wildcard
 repo.</p>
+
+<p>The limit of number of repos shown in big-config mode (20, by default)
+described earlier applies to the "expand" command also.</p>

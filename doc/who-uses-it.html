@@ -26,18 +26,18 @@ installation anywhere.  The whole <a href="http://sitaramc.github.com/gitolite/d
 for them (their config file was so big that without the big-config changes
 gitolite would just run out of memory and die!).</p>
 
-<p>The <strong>KDE project</strong> is currently <a href="http://www.omat.nl/2010/07/07/move-to-git-the-progress-so-far/">testing</a> gitolite to see if it will
-suit their needs (in combination with redmine for issue tracking and
-reviewboard for code review), after an initial <a href="http://permalink.gmane.org/gmane.comp.kde.scm-interest/1437">review of alternatives</a>
-by a core group.  Apart from the usual access control, the KDE folks will be
-using many of the "ad hoc repo creation" features enabled by wildrepos and the
-accompanying commands.  Some of the changes to the "admin defined commands"
-were inspired by KDE's needs.</p>
+<p>The <strong>KDE project</strong> <a href="http://community.kde.org/Sysadmin/GitKdeOrgManual">uses</a> gitolite (in combination with redmine for
+issue tracking and reviewboard for code review).  Apart from the usual access
+control, the KDE folks are heavy users of the "ad hoc repo creation" features
+enabled by wildrepos and the accompanying commands.  Several of the changes to
+the "admin defined commands" were also inspired by KDE's needs.  See <a href="http://community.kde.org/Sysadmin/GitKdeOrgManual#Server-side_commands">section
+5</a> and <a href="http://community.kde.org/Sysadmin/GitKdeOrgManual#Personal_repositories">section 6</a> of the above linked page for details.</p>
 
 <p><strong>Prof. Hiren Patel</strong> of the University of Waterloo is responsible for the
 existence of the fairly popular "<a href="http://sitaramc.github.com/gitolite/doc/wildcard-repositories.html">wildrepos</a>" feature.  The
 documentation was pretty much written with his use case in mind, but of course
-it turns out to be useful for a lot of people.</p>
+it turns out to be useful for a lot of people, as you can see from the
+previous para on KDE's use of gitolite.</p>
 
 <p>In fact, he surprised the heck out of me recently by saying that if it hadn't
 been for this feature, he might not have used git itself -- which is a pretty
